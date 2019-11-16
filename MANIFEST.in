@@ -4,5 +4,6 @@ include moto/ec2/resources/instance_types.json
 include moto/ec2/resources/amis.json
 include moto/cognitoidp/resources/*.json
 include moto/dynamodb2/parsing/reserved_keywords.txt
+include moto/rds3/resources/*.json
 recursive-include moto/templates *
 recursive-include tests *
