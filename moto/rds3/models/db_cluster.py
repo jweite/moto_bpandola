@@ -38,6 +38,8 @@ class DBCluster(TaggableRDSResource, EventMixin, BaseRDSModel):
                  storage_encrypted=False,
                  tags=None,
                  vpc_security_group_ids=None,
+                 engine_mode=None,
+                 scaling_configuration=None,
                  **kwargs):
         super(DBCluster, self).__init__(backend)
         self.allocated_storage = 1
@@ -50,11 +52,13 @@ class DBCluster(TaggableRDSResource, EventMixin, BaseRDSModel):
         self.db_cluster_parameter_group_name = db_cluster_parameter_group_name
         self._db_subnet_group = db_subnet_group
         self.engine = engine
+        self.engine_mode = engine_mode
         self.engine_version = engine_version
         self.master_user_password = master_user_password
         self.master_username = master_username
         self.preferred_backup_window = preferred_backup_window or '05:30-06:00'
         self.port = port
+        self.scaling_configuration_info = scaling_configuration
         self.storage_type = 'aurora'
         self.storage_encrypted = storage_encrypted
         if self.storage_encrypted:
@@ -260,4 +264,10 @@ class DBClusterBackend(BaseRDSBackend):
             kwargs['db_subnet_group'] = self.get_db_subnet_group(kwargs['db_subnet_group_name'])
         if 'port' not in kwargs:
             kwargs['port'] = utils.default_engine_port(engine)
+        if kwargs.get('engine_mode') and kwargs.get('engine_mode') not in utils.valid_engine_modes():
+            msg = 'Invalid engine_mode {} specified.'.format(kwargs['engine_mode'])     # ToDo: sync msg with boto3
+            raise InvalidParameterValue(msg)
+        if "scaling_configuration" in kwargs and kwargs.get("engine_mode") != "serverless":
+            msg = 'scaling_configuration only valid with serverless engine_mode.'       # ToDo: sync msg with boto3
+            raise InvalidParameterValue(msg)
         return kwargs

@@ -56,6 +56,36 @@ def test_create_db_cluster():
 
 
 @mock_rds
+def test_create_db_cluster_serverless():
+    client = boto3.client('rds', region_name='us-west-2')
+    scaling_configuration = {
+       "MinCapacity": 2,
+       "MaxCapacity": 8,
+       "AutoPause": True,
+       "SecondsUntilAutoPause": 60,
+       "TimeoutAction": "ForceApplyCapacityChange"
+    }
+    cluster = client.create_db_cluster(DBClusterIdentifier='cluster-1',
+                                       DatabaseName='db_name',
+                                       Engine='aurora-postgresql',
+                                       EngineMode='serverless',
+                                       ScalingConfiguration=scaling_configuration,
+                                       MasterUsername='root',
+                                       MasterUserPassword='password',
+                                       Port=1234,
+                                       Tags=test_tags).get('DBCluster')
+    this(cluster['DBClusterIdentifier']).should.equal('cluster-1')
+    tag_list = client.list_tags_for_resource(ResourceName=cluster['DBClusterArn']).get('TagList')
+    this(tag_list).should.equal(test_tags)
+    this(cluster['EngineMode']).should.equal('serverless')
+    this(cluster['ScalingConfigurationInfo']).should.equal(scaling_configuration)
+
+    cluster = client.describe_db_clusters(DBClusterIdentifier='cluster-1')["DBClusters"][0]
+    this(cluster['EngineMode']).should.equal('serverless')
+    this(cluster['ScalingConfigurationInfo']).should.equal(scaling_configuration)
+
+
+@mock_rds
 def test_modify_db_cluster():
     client = boto3.client('rds', region_name='us-west-2')
     cluster_id = 'cluster-1'

@@ -132,3 +132,7 @@ def default_db_parameter_group_name(engine_name, engine_version):
 def get_engine_defaults(engine_name):
     defaults = next(item for item in db_engine_defaults if item['Engine'] == engine_name)
     return defaults
+
+
+def valid_engine_modes():
+    return ["provisioned", "serverless", "parallelquery", "global"]

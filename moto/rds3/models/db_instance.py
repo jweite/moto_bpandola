@@ -6,7 +6,8 @@ from re import compile as re_compile
 
 from moto.cloudformation.exceptions import UnformattedGetAttTemplateException
 from moto.compat import OrderedDict
-from moto.core.utils import get_random_hex, iso_8601_datetime_with_milliseconds
+# from moto.core.utils import get_random_hex, iso_8601_datetime_with_milliseconds
+from moto.core.utils import get_random_hex
 from ..exceptions import (
     DBInstanceAlreadyExists,
     DBInstanceNotFound,

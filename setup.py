@@ -32,6 +32,8 @@ def get_version():
 
 
 install_requires = [
+    "urllib3<1.26,>=1.25.4",
+    "ecdsa<0.15",
     "boto>=2.36.0",
     "boto3>=1.9.201",
     "botocore>=1.12.201",
